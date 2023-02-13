@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "330201716515",
+    "project_id": "hoodie-bc4c2",
+    "storage_bucket": "hoodie-bc4c2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330201716515:android:a2264afe8ece11c0925e96",
+        "android_client_info": {
+          "package_name": "com.example.hoodie"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "330201716515-h4k2lsjuu06tid306b3icuddg659cpvs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuHPu4VFkGFFc1N9ZRZFkB7ShA6cuWQJU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "330201716515-h4k2lsjuu06tid306b3icuddg659cpvs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>330201716515-8vbu6smr3dgoj8f4pkvqfl09fe23di9n.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.330201716515-8vbu6smr3dgoj8f4pkvqfl09fe23di9n</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCgPKOXckfedebVpLI5zCvUnCkKrkWh_JI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>330201716515</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.hoodie</string>
+	<key>PROJECT_ID</key>
+	<string>hoodie-bc4c2</string>
+	<key>STORAGE_BUCKET</key>
+	<string>hoodie-bc4c2.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:330201716515:ios:934e8c6512444b00925e96</string>
+</dict>
+</plist>
