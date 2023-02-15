@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ProfileScreen extends StatefulWidget {
-  static const route = "ProfileScreen";
-  const ProfileScreen({super.key});
+class ProfileFragment extends StatefulWidget {
+  const ProfileFragment({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<ProfileFragment> createState() => _ProfileFragmentState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileFragmentState extends State<ProfileFragment> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -49,7 +48,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    final uri = Uri.parse("https://www.snapchat.com/unlock/?type=SNAPCODE&uuid=0c9ed57047564f06b0f0c0d1cc36032b&metadata=01");
+                    final uri = Uri.parse(
+                        "https://www.snapchat.com/unlock/?type=SNAPCODE&uuid=0c9ed57047564f06b0f0c0d1cc36032b&metadata=01");
                     if (await canLaunchUrl(uri)) {
                       await launchUrl(uri);
                     } else {
