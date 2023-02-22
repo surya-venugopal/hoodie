@@ -15,11 +15,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _selectedIndex == 0
-          ? const DashboardFragment()
-          : _selectedIndex == 1
-              ? const ProfileFragment()
-              : Container(),
+      body: SafeArea(
+        child: _selectedIndex == 0
+            ? DashboardFragment()
+            : _selectedIndex == 1
+                ? const ProfileFragment()
+                : Container(),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (value) {

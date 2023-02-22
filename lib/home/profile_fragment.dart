@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+import '../Models/product_model.dart';
+import '../widgets/product_view.dart';
 
 class ProfileFragment extends StatefulWidget {
   const ProfileFragment({super.key});
@@ -9,68 +11,124 @@ class ProfileFragment extends StatefulWidget {
 }
 
 class _ProfileFragmentState extends State<ProfileFragment> {
+  final ScrollController _parentScrollController = ScrollController();
+  final ScrollController _childScrollController = ScrollController();
+
+  List<ProductModel> products = [
+    ProductModel(
+        color: Colors.green,
+        id: "id",
+        name: "1",
+        description: "40 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.green,
+        id: "id",
+        name: "1",
+        description: "40 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.green,
+        id: "id",
+        name: "1",
+        description: "40 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+  ];
+  @override
+  void initState() {
+    _parentScrollController.addListener(() {
+      if (_parentScrollController.offset ==
+              _parentScrollController.position.maxScrollExtent &&
+          _childScrollController.position.maxScrollExtent != 0) {
+        setState(() {
+          _scroll = true;
+        });
+      }
+    });
+
+    _childScrollController.addListener(() {
+      if (_childScrollController.offset == 0) {
+        setState(() {
+          _scroll = false;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  bool _scroll = false;
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 200,
-                  color: Colors.red,
+
+    return ListView(
+      shrinkWrap: true,
+      controller: _parentScrollController,
+      children: [
+        Container(
+          color: Theme.of(context).primaryColor,
+          height: 260,
+          width: double.infinity,
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(75),
+                child: Image.network(
+                  "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3",
+                  height: 150,
                 ),
-                const SizedBox(height: 80),
-                const Text(
-                  "Surya",
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    children: [
-                      Card(
-                        child: Image.network(
-                            "https://firebasestorage.googleapis.com/v0/b/linen-hook-346309.appspot.com/o/head_wings.png?alt=media&token=d7ad070e-2288-4deb-a8a7-6d940204017b"),
-                      ),
-                      Card(
-                        child: Image.network(
-                            "https://firebasestorage.googleapis.com/v0/b/linen-hook-346309.appspot.com/o/wings.png?alt=media&token=3f64fe77-21b2-40fd-8480-1b08f3fc94bb"),
-                      ),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    final uri = Uri.parse(
-                        "https://www.snapchat.com/unlock/?type=SNAPCODE&uuid=0c9ed57047564f06b0f0c0d1cc36032b&metadata=01");
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri);
-                    } else {
-                      throw 'Could not launch wings';
-                    }
-                  },
-                  child: const Text("View on snapchat"),
-                )
-              ],
-            ),
-            Positioned(
-              top: 130,
-              left: size.width / 2 - 70,
-              child: const CircleAvatar(
-                radius: 70,
-                backgroundColor: Colors.blue,
               ),
-            )
-          ],
+              const SizedBox(height: 20),
+              const Text(
+                "Points",
+                style: TextStyle(color: Colors.white),
+              ),
+              const Text(
+                "2450",
+                style: TextStyle(
+                  color: Colors.yellowAccent,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+        const SizedBox(height: 10),
+        const Text(
+          "My skins",
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: products.length < 3 ? 300 : size.height,
+          child: GridView.builder(
+            controller: _childScrollController,
+            physics: _scroll
+                ? const AlwaysScrollableScrollPhysics()
+                : const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.7,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+            ),
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              ProductModel product = products[index];
+              return ProductView(product: product);
+            },
+          ),
+        ),
+      ],
     );
   }
 }

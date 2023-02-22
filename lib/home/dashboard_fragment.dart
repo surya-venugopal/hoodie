@@ -1,9 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:hoodie/Models/product_model.dart';
 
 import '../widgets/product_view.dart';
 
 class DashboardFragment extends StatelessWidget {
-  const DashboardFragment({super.key});
+  DashboardFragment({super.key});
+
+  List<ProductModel> products = [
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+    ProductModel(
+        color: Colors.red,
+        id: "id",
+        name: "sura",
+        description: "30 \$",
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -11,114 +106,19 @@ class DashboardFragment extends StatelessWidget {
     return Container(
       height: size.height,
       padding: const EdgeInsets.all(10),
-      child: ListView(
-        children: [
-          Card(
-            margin: const EdgeInsets.symmetric(horizontal: 50),
-            elevation: 3,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Hoodie",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.camera_alt,
-                    ),
-                    color: Colors.black,
-                    iconSize: 24,
-                    splashRadius: 20,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 30),
-          const Text(
-            "Featured",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 350,
-            width: size.width,
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-              ),
-              scrollDirection: Axis.horizontal,
-              controller: ScrollController(),
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                return Card(
-                  elevation: 1,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: InkWell(
-                      onTap: () {},
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Image.asset(
-                            "assets/test.png",
-                            fit: BoxFit.cover,
-                            height: 100,
-                            width: double.infinity,
-                          ),
-                          Text(
-                            "wing $index",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Container(
-                            color: Colors.purple,
-                            width: double.infinity,
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: const Text(
-                              "400 \$",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 30),
-          const Text(
-            "Recents",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          ...[1, 2, 3, 4, 5].map((element) {
-            return Column(
-              children: [
-                productView(
-                    size: Size(size.width * 2 / 3, size.width),
-                    img: "assets/test.png",
-                    name: "wing $element",
-                    price: 40,
-                    color: Colors.green),
-                const SizedBox(height: 10),
-              ],
-            );
-          }),
-        ],
+      child: GridView.builder(
+        padding: const EdgeInsets.all(8),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.7,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+        ),
+        itemCount: products.length,
+        itemBuilder: (BuildContext context, int index) {
+          ProductModel product = products[index];
+          return ProductView(product: product);
+        },
       ),
     );
   }
