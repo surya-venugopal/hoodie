@@ -52,6 +52,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '330201716515',
     projectId: 'hoodie-bc4c2',
     authDomain: 'hoodie-bc4c2.firebaseapp.com',
+    databaseURL: 'https://hoodie-bc4c2-default-rtdb.firebaseio.com',
     storageBucket: 'hoodie-bc4c2.appspot.com',
     measurementId: 'G-6GQ9YVQBLZ',
   );
@@ -61,6 +62,7 @@ class DefaultFirebaseOptions {
     appId: '1:330201716515:android:a2264afe8ece11c0925e96',
     messagingSenderId: '330201716515',
     projectId: 'hoodie-bc4c2',
+    databaseURL: 'https://hoodie-bc4c2-default-rtdb.firebaseio.com',
     storageBucket: 'hoodie-bc4c2.appspot.com',
   );
 
@@ -69,7 +71,9 @@ class DefaultFirebaseOptions {
     appId: '1:330201716515:ios:934e8c6512444b00925e96',
     messagingSenderId: '330201716515',
     projectId: 'hoodie-bc4c2',
+    databaseURL: 'https://hoodie-bc4c2-default-rtdb.firebaseio.com',
     storageBucket: 'hoodie-bc4c2.appspot.com',
+    androidClientId: '330201716515-vv0hi53b57sj96i3b83ai0juuhdm1226.apps.googleusercontent.com',
     iosClientId: '330201716515-8vbu6smr3dgoj8f4pkvqfl09fe23di9n.apps.googleusercontent.com',
     iosBundleId: 'com.example.hoodie',
   );

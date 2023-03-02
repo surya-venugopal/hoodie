@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hoodie/home/home_screen.dart';
+import 'package:hoodie/home/initial_setup_screen.dart';
 import 'package:hoodie/splash_screen.dart';
 
 void main() {
@@ -28,6 +29,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         HomeScreen.route: (context) => const HomeScreen(),
         SplashScreen.route: (context) => const SplashScreen(),
+        InitialSetupScreen.route: (context) => const InitialSetupScreen(),
       },
     );
   }
