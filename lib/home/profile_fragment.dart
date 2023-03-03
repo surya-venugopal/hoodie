@@ -14,29 +14,7 @@ class _ProfileFragmentState extends State<ProfileFragment> {
   final ScrollController _parentScrollController = ScrollController();
   final ScrollController _childScrollController = ScrollController();
 
-  List<ProductModel> products = [
-    ProductModel(
-        color: Colors.green,
-        id: "id",
-        name: "1",
-        description: "40 \$",
-        imageUrl:
-            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
-    ProductModel(
-        color: Colors.green,
-        id: "id",
-        name: "1",
-        description: "40 \$",
-        imageUrl:
-            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
-    ProductModel(
-        color: Colors.green,
-        id: "id",
-        name: "1",
-        description: "40 \$",
-        imageUrl:
-            "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3"),
-  ];
+  List<ProductModel> products = [];
   @override
   void initState() {
     _parentScrollController.addListener(() {

@@ -1,9 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
-
-import 'home_screen.dart';
 
 class InitialSetupScreen extends StatefulWidget {
   static const route = "InitialSetupScreen";
@@ -16,7 +14,7 @@ class InitialSetupScreen extends StatefulWidget {
 class _InitialSetupScreenState extends State<InitialSetupScreen> {
   final _qrScanner = QrBarCodeScannerDialog();
 
-  String? code;
+  String _msg = "Start Setup";
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +26,8 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
       body: Center(
         child: Column(
           children: [
-            const Text("Start Setup"),
+            Text(_msg),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 _qrScanner.getScannedQrBarCode(
@@ -46,30 +45,37 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
                             actions: [
                               ElevatedButton(
                                   onPressed: () async {
-                                    DatabaseReference ref = FirebaseDatabase
+                                    var snapshot = await FirebaseFirestore
                                         .instance
-                                        .ref("users/${user.uid}");
+                                        .collection('users')
+                                        .where("hoodie", isEqualTo: code)
+                                        .get();
 
-                                    await ref.set({
-                                      "name": user.displayName,
-                                      "hoodie": code,
-                                      "current_skin": "",
-                                    });
-
-                                    Navigator.of(context)
-                                        .pushReplacementNamed(HomeScreen.route);
+                                    if (snapshot.size == 0) {
+                                      await FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(user.uid)
+                                          .set({
+                                        "name": user.displayName,
+                                        "hoodie": code,
+                                        "current_skin": "",
+                                      });
+                                      Navigator.of(context).pop();
+                                    } else {
+                                      setState(() {
+                                        _msg =
+                                            "Ooops ... This hoodie is connected to another account!";
+                                      });
+                                    }
                                   },
                                   child: const Text("Link"))
                             ],
                           );
                         },
                       );
-                      setState(() {
-                        this.code = code;
-                      });
                     });
               },
-              child: Text(code ?? "Click me"),
+              child: const Text("Click me"),
             ),
           ],
         ),

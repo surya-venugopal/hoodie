@@ -5,6 +5,7 @@ class ProductModel {
   final String name;
   final String description;
   final String imageUrl;
+  final String modelUrl;
   final Color color;
 
   ProductModel(
@@ -12,5 +13,6 @@ class ProductModel {
       required this.color,
       required this.name,
       required this.description,
-      required this.imageUrl});
+      required this.imageUrl,
+      required this.modelUrl});
 }
