@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
-import 'home/home_screen.dart';
+import 'screens/home_screen.dart';
 import 'user management/login_helper.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -21,8 +21,9 @@ class _SplashScreenState extends State<SplashScreen> {
       options: DefaultFirebaseOptions.currentPlatform,
     ).then((value) async {
       final user = FirebaseAuth.instance.currentUser;
+      Navigator.of(context).pushReplacementNamed(HomeScreen.route);
       if (user == null) {
-        await LoginHelper.signInWithGoogle(); 
+        // await LoginHelper.signInWithGoogle(); 
       } else {
         Navigator.of(context).pushReplacementNamed(HomeScreen.route);
       }

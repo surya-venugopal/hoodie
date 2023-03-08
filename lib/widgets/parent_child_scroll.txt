@@ -1,0 +1,25 @@
+  final ScrollController _parentScrollController = ScrollController();
+  final ScrollController _childScrollController = ScrollController();
+
+  List<ProductModel> products = [];
+  @override
+  void initState() {
+    _parentScrollController.addListener(() {
+      if (_parentScrollController.offset ==
+              _parentScrollController.position.maxScrollExtent &&
+          _childScrollController.position.maxScrollExtent != 0) {
+        setState(() {
+          _scroll = true;
+        });
+      }
+    });
+
+    _childScrollController.addListener(() {
+      if (_childScrollController.offset == 0) {
+        setState(() {
+          _scroll = false;
+        });
+      }
+    });
+    super.initState();
+  }

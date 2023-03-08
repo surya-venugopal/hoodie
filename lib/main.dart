@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hoodie/home/home_screen.dart';
-import 'package:hoodie/home/initial_setup_screen.dart';
+import 'package:hoodie/screens/home_screen.dart';
+import 'package:hoodie/screens/initial_setup_screen.dart';
 import 'package:hoodie/splash_screen.dart';
 
 void main() {

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-class ProductModel {
+class SkinModel {
   final String id;
   final String name;
+  final double price;
   final String description;
   final String imageUrl;
   final String modelUrl;
-  final Color color;
+  final int color;
 
-  ProductModel(
+  SkinModel(
       {required this.id,
+      required this.price,
       required this.color,
       required this.name,
       required this.description,
