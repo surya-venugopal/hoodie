@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hoodie/Models/skin_model.dart';
 import 'package:hoodie/app_utils.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:provider/provider.dart';
 
 class SkinView extends StatelessWidget {
   final SkinModel skin;
@@ -55,48 +55,13 @@ class SkinView extends StatelessWidget {
                           ),
                           ElevatedButton(
                             onPressed: () async {
-                              if (HasBought.yes == hasBought
-                                  // && currentSkin != skin.id
-                                  ) {
-                                await FirebaseFirestore.instance
-                                    .collection("users")
-                                    .doc(AppUtils.uid)
-                                    .update({"currentSkin": skin.id});
-
-                                // sample data
-
-                                // await FirebaseFirestore.instance
-                                //     .collection("skins")
-                                //     .add({
-                                //   "color": 0,
-                                //   "imageUrl":
-                                //       "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3",
-                                //   "modelUrl":
-                                //       "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
-                                //   "name": "1",
-                                //   "price": 23,
-                                // }).then((doc) {
-                                //   FirebaseFirestore.instance
-                                //       .collection("skins")
-                                //       .doc(doc.id)
-                                //       .update({"id": doc.id});
-                                // });
-                              } else {
-                                // Navigator.of(context).pushNamed();
-                                await FirebaseFirestore.instance
-                                    .collection("users")
-                                    .doc(AppUtils.uid)
-                                    .collection("skins")
-                                    .doc(skin.id)
-                                    .set({
-                                  "id": skin.id,
-                                  "color": skin.color,
-                                  "imageUrl": skin.imageUrl,
-                                  "modelUrl": skin.modelUrl,
-                                  "name": skin.name,
-                                  "price": skin.price,
-                                });
-                              }
+                              await Provider.of<SkinsProvider>(context,
+                                      listen: false)
+                                  .buySkin(
+                                skin: skin,
+                                hasBought: hasBought,
+                                currentSkin: currentSkin,
+                              );
                             },
                             child: Text(skin.description),
                           ),

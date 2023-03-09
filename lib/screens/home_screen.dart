@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hoodie/screens/dashboard_fragment.dart';
 import 'package:hoodie/screens/profile_fragment.dart';
@@ -49,7 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             _selectedIndex = value;
             _pageController.jumpToPage(_selectedIndex);
-
           });
         },
         items: const [
@@ -67,4 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+
 }
