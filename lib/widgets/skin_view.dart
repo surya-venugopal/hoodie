@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hoodie/Models/skin_model.dart';
+import 'package:hoodie/Models/skin_management.dart';
 import 'package:hoodie/app_utils.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
@@ -7,13 +7,12 @@ import 'package:provider/provider.dart';
 class SkinView extends StatelessWidget {
   final SkinModel skin;
   final HasBought hasBought;
-  final String currentSkin;
 
-  const SkinView(
-      {super.key,
-      required this.skin,
-      required this.hasBought,
-      this.currentSkin = ""});
+  const SkinView({
+    super.key,
+    required this.skin,
+    required this.hasBought,
+  });
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -55,15 +54,25 @@ class SkinView extends StatelessWidget {
                           ),
                           ElevatedButton(
                             onPressed: () async {
-                              await Provider.of<SkinsProvider>(context,
-                                      listen: false)
-                                  .buySkin(
-                                skin: skin,
-                                hasBought: hasBought,
-                                currentSkin: currentSkin,
-                              );
+                              if (hasBought == HasBought.yes) {
+                                await Provider.of<SkinsProvider>(context,
+                                        listen: false)
+                                    .changeSkin(
+                                  c1,
+                                  skin: skin,
+                                );
+                              } else {
+                                await Provider.of<SkinsProvider>(context,
+                                        listen: false)
+                                    .buySkin(
+                                  c1,
+                                  skin: skin,
+                                );
+                              }
                             },
-                            child: Text(skin.description),
+                            child: Text(hasBought == HasBought.yes && skin.description != "Equipped"
+                                ? "Equip"
+                                : skin.description),
                           ),
                         ],
                       ),

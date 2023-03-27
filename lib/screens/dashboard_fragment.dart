@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hoodie/Models/skin_model.dart';
+import 'package:hoodie/Models/skin_management.dart';
 import 'package:provider/provider.dart';
 import '../app_utils.dart';
+import '../Models/user_management.dart';
 import '../widgets/skin_view.dart';
 
 class DashboardFragment extends StatefulWidget {
@@ -41,8 +42,8 @@ class _DashboardFragmentState extends State<DashboardFragment>
   Widget build(BuildContext context) {
     provider = Provider.of<SkinsProvider>(context, listen: true);
     if (_isInit) {
+      UserProvider.getUser().then((value) => provider.getUser());
       provider.getMySkins().then((value) => provider.getSkins());
-      provider.getCurrentSkin();
       _isInit = false;
     }
 
@@ -54,7 +55,7 @@ class _DashboardFragmentState extends State<DashboardFragment>
           Expanded(
             child: skins.isEmpty && !provider.isLoading
                 ? const Center(
-                    child: Text('No Data...'),
+                    child: Text('You owned all the skins!'),
                   )
                 : GridView.builder(
                     padding: const EdgeInsets.all(8),

@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "linen-hook-346309"
-  }
+  },
+  "targets": {
+    "linen-hook-346309": {
+      "hosting": {
+        "app": [
+          "hoodie-bc4c2"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

@@ -1,10 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hoodie/widgets/my_skins.dart';
 import 'package:provider/provider.dart';
 
-import '../Models/skin_model.dart';
-import '../app_utils.dart';
+import '../Models/skin_management.dart';
+import '../Models/user_management.dart';
+import 'connect_hoodie_screen.dart';
 
 class ProfileFragment extends StatefulWidget {
   const ProfileFragment({super.key});
@@ -19,16 +19,15 @@ class _ProfileFragmentState extends State<ProfileFragment>
         AutomaticKeepAliveClientMixin<ProfileFragment> {
   late TabController tabController;
 
-  late SkinsProvider provider;
+  late SkinsProvider skinProvider;
 
   bool _isInit = true;
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    provider = Provider.of<SkinsProvider>(context, listen: true);
+    skinProvider = Provider.of<SkinsProvider>(context, listen: true);
     if (_isInit) {
-    
       _isInit = false;
       tabController = TabController(length: 2, vsync: this);
     }
@@ -36,6 +35,17 @@ class _ProfileFragmentState extends State<ProfileFragment>
     return ListView(
       shrinkWrap: true,
       children: [
+        Container(
+          height: 40,
+          width: double.infinity,
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(ConnectHoodieScreen.route);
+            },
+            child: const Text("Connect your Hoodie"),
+          ),
+        ),
         Container(
           color: Theme.of(context).primaryColor,
           height: 200,
@@ -54,29 +64,27 @@ class _ProfileFragmentState extends State<ProfileFragment>
                       height: 150,
                     ),
                   ),
-                  const Text(
-                    "Surya",
-                    style: TextStyle(color: Colors.white),
+                  Text(
+                    UserProvider.name,
+                    style: const TextStyle(color: Colors.white),
                   )
                 ],
               ),
               const SizedBox(height: 20),
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      "Points",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      "2450",
-                      style: TextStyle(
-                        color: Colors.yellowAccent,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ]),
+              Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Text(
+                  "Points",
+                  style: TextStyle(color: Colors.white),
+                ),
+                Text(
+                  skinProvider.points.toString(),
+                  style: const TextStyle(
+                    color: Colors.yellowAccent,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ]),
             ],
           ),
         ),
@@ -103,7 +111,13 @@ class _ProfileFragmentState extends State<ProfileFragment>
             child: TabBarView(
               controller: tabController,
               children: [
-                MySkins(skins: provider.mySkins, currentSkin: provider.currentSkin),
+                skinProvider.mySkins.isEmpty
+                    ? const Center(
+                        child: Text("No skins found"),
+                      )
+                    : MySkins(
+                        mySkins: skinProvider.mySkins,
+                        currentSkin: skinProvider.currentSkin),
                 const Text("sadsda"),
               ],
             )),

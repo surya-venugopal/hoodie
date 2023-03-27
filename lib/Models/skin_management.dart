@@ -2,14 +2,13 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import '../app_utils.dart';
+import 'package:hoodie/Models/user_management.dart';
 
 class SkinModel {
   final String id;
   final String name;
   final double price;
-  final String description;
+  String description;
   final String imageUrl;
   final String modelUrl;
   final int color;
@@ -28,28 +27,25 @@ class SkinsProvider with ChangeNotifier {
   List<SkinModel> skins = [];
   List<SkinModel> mySkins = [];
 
-  late String currentSkin;
-
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   bool isLoading = false;
   bool hasMore = true;
   final int _documentLimit = 10;
   DocumentSnapshot? lastDocument;
 
-  Future<void> getCurrentSkin() async {
-    DocumentSnapshot user = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(AppUtils.uid)
-        .get();
+  late String currentSkin;
+  late int points;
 
-    currentSkin = user["currentSkin"];
+  getUser() {
+    currentSkin = UserProvider.currentSkin;
+    points = UserProvider.points;
     notifyListeners();
   }
 
   Future<void> getMySkins() async {
     QuerySnapshot querySnapshot = await firestore
         .collection("users")
-        .doc(AppUtils.uid)
+        .doc(UserProvider.uid)
         .collection("skins")
         // .orderBy('date')
         .get();
@@ -127,33 +123,64 @@ class SkinsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  buySkin(
-      {required SkinModel skin,
-      required HasBought hasBought,
-      required String currentSkin}) async {
-    if (HasBought.yes == hasBought && currentSkin != skin.id) {
+  changeSkin(
+    BuildContext context, {
+    required SkinModel skin,
+  }) async {
+    if (UserProvider.currentSkin != skin.id) {
       await FirebaseFirestore.instance
           .collection("users")
-          .doc(AppUtils.uid)
+          .doc(UserProvider.uid)
           .update({"currentSkin": skin.id});
-    } else {
-      // Navigator.of(context).pushNamed();
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(AppUtils.uid)
-          .collection("skins")
-          .doc(skin.id)
-          .set({
-        "id": skin.id,
-        "color": skin.color,
-        "imageUrl": skin.imageUrl,
-        "modelUrl": skin.modelUrl,
-        "name": skin.name,
-        "price": skin.price,
+
+      UserProvider.currentSkin = skin.id;
+      currentSkin = UserProvider.currentSkin;
+      notifyListeners();
+    }
+    Navigator.of(context).pop();
+  }
+
+  buySkin(
+    BuildContext context, {
+    required SkinModel skin,
+  }) async {
+    // Navigator.of(context).pushNamed();
+
+    var db = FirebaseFirestore.instance;
+
+    db.runTransaction((transaction) async {
+      transaction.set(
+          db
+              .collection("users")
+              .doc(UserProvider.uid)
+              .collection("skins")
+              .doc(skin.id),
+          {
+            "id": skin.id,
+            "color": skin.color,
+            "imageUrl": skin.imageUrl,
+            "modelUrl": skin.modelUrl,
+            "name": skin.name,
+            "price": skin.price,
+          });
+
+      transaction.update(db.collection("users").doc(UserProvider.uid), {
+        "points": UserProvider.points + skin.price * (skin.color + 1),
+        "currentSkin": skin.id,
       });
+    }).then((value) {
+      UserProvider.points =
+          (UserProvider.points + skin.price * (skin.color + 1)).toInt();
+
+      UserProvider.currentSkin = skin.id;
+
+      points = UserProvider.points;
+      currentSkin = UserProvider.currentSkin;
+
       skins.removeWhere((product) => product.id == skin.id);
       mySkins.add(skin);
       notifyListeners();
-    }
+      Navigator.of(context).pop();
+    });
   }
 }

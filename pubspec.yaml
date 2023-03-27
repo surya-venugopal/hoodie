@@ -45,6 +45,8 @@ dependencies:
   qr_bar_code_scanner_dialog: ^0.0.5
   cloud_firestore: ^4.4.3
   model_viewer_plus: ^1.5.0
+  google_sign_in: ^6.0.2
+  phone_form_field: ^7.0.5
 
 dev_dependencies:
   flutter_test:

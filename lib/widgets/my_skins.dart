@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:hoodie/Models/skin_model.dart';
+import 'package:hoodie/Models/skin_management.dart';
 
 import '../app_utils.dart';
 import 'skin_view.dart';
 
 class MySkins extends StatelessWidget {
-  final List<SkinModel> skins;
+  final List<SkinModel> mySkins;
   final String currentSkin;
 
-  const MySkins({super.key, required this.skins, required this.currentSkin});
+  const MySkins({super.key, required this.mySkins, required this.currentSkin});
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +20,19 @@ class MySkins extends StatelessWidget {
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
       ),
-      itemCount: skins.length,
+      itemCount: mySkins.length,
       itemBuilder: (BuildContext context, int index) {
-        var skin = skins[index];
+        var skin = mySkins.elementAt(index);
+
+        if (currentSkin == skin.id) {
+          skin.description = "Equipped";
+        } else {
+          skin.description = "${skin.price} \$";
+        }
 
         return SkinView(
           skin: skin,
           hasBought: HasBought.yes,
-          currentSkin: currentSkin,
         );
       },
     );
