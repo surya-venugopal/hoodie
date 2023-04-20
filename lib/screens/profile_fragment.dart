@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hoodie/widgets/my_skins.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../Models/skin_management.dart';
 import '../Models/user_management.dart';
-import 'connect_hoodie_screen.dart';
+import '../widgets/my_skins.dart';
 
 class ProfileFragment extends StatefulWidget {
   const ProfileFragment({super.key});
@@ -32,95 +32,86 @@ class _ProfileFragmentState extends State<ProfileFragment>
       tabController = TabController(length: 2, vsync: this);
     }
 
-    return ListView(
-      shrinkWrap: true,
-      children: [
-        Container(
-          height: 40,
-          width: double.infinity,
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(ConnectHoodieScreen.route);
-            },
-            child: const Text("Connect your Hoodie"),
-          ),
-        ),
-        Container(
-          color: Theme.of(context).primaryColor,
-          height: 200,
-          width: double.infinity,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const SizedBox(height: 20),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          expandedHeight: 200.0,
+          flexibleSpace: FlexibleSpaceBar(
+            background: Container(
+              color: Theme.of(context).primaryColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(75),
-                    child: Image.network(
-                      "https://firebasestorage.googleapis.com/v0/b/hoodie-bc4c2.appspot.com/o/Screenshot%202023-02-15%20150925.png?alt=media&token=e1d72238-7068-4168-a435-fa795fcaa0c3",
-                      height: 150,
-                    ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(75),
+                        child: SvgPicture.asset(
+                          "assets/avatars/avatar${UserProvider.avatar}.svg",
+                          height: 130,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        UserProvider.name,
+                        style: const TextStyle(color: Colors.white),
+                      )
+                    ],
                   ),
-                  Text(
-                    UserProvider.name,
-                    style: const TextStyle(color: Colors.white),
-                  )
+                  Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Skin Score",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          skinProvider.points.toString(),
+                          style: const TextStyle(
+                            color: Colors.yellowAccent,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ]),
+                  Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Reward Points",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          "50",
+                          style: TextStyle(
+                            color: Colors.yellowAccent,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ]),
                 ],
               ),
-              const SizedBox(height: 20),
-              Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Text(
-                  "Points",
-                  style: TextStyle(color: Colors.white),
-                ),
-                Text(
-                  skinProvider.points.toString(),
-                  style: const TextStyle(
-                    color: Colors.yellowAccent,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ]),
-            ],
+            ),
           ),
         ),
-        TabBar(
-          controller: tabController,
-          tabs: const [
-            Tab(
-              child: Text(
-                "Skins",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-            Tab(
-              child: Text(
-                "Spotted",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-          ],
+        SliverFixedExtentList(
+          itemExtent: MediaQuery.of(context).size.height - 50,
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              return skinProvider.mySkins.isEmpty
+                  ? const Center(
+                      child: Text("No skins found"),
+                    )
+                  : MySkins(
+                      mySkins: skinProvider.mySkins,
+                      currentSkin: skinProvider.currentSkin);
+            },
+            childCount: 1,
+          ),
         ),
-        SizedBox(
-            height: 300,
-            width: double.infinity,
-            child: TabBarView(
-              controller: tabController,
-              children: [
-                skinProvider.mySkins.isEmpty
-                    ? const Center(
-                        child: Text("No skins found"),
-                      )
-                    : MySkins(
-                        mySkins: skinProvider.mySkins,
-                        currentSkin: skinProvider.currentSkin),
-                const Text("sadsda"),
-              ],
-            )),
       ],
     );
   }

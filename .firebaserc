@@ -1,6 +1,8 @@
 {
   "projects": {
-    "default": "linen-hook-346309"
+    "default": "linen-hook-346309",
+    "hoodie": "hoodie-bc4c2",
+    "test": "linen-hook-346309"
   },
   "targets": {
     "linen-hook-346309": {

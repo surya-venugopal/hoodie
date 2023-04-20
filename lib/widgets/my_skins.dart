@@ -31,6 +31,7 @@ class MySkins extends StatelessWidget {
         }
 
         return SkinView(
+          height: 200,
           skin: skin,
           hasBought: HasBought.yes,
         );

@@ -44,10 +44,8 @@ class SkinsProvider with ChangeNotifier {
 
   Future<void> getMySkins() async {
     QuerySnapshot querySnapshot = await firestore
-        .collection("users")
-        .doc(UserProvider.uid)
-        .collection("skins")
-        // .orderBy('date')
+        .collection("user_skins")
+        .where("uid", isEqualTo: UserProvider.uid)
         .get();
 
     for (var skin in querySnapshot.docs) {
@@ -140,47 +138,61 @@ class SkinsProvider with ChangeNotifier {
     Navigator.of(context).pop();
   }
 
+  SkinModel? skinToBuy;
+  BuildContext? context;
   buySkin(
     BuildContext context, {
     required SkinModel skin,
   }) async {
-    // Navigator.of(context).pushNamed();
+    this.context = context;
+    skinToBuy = skin;
 
-    var db = FirebaseFirestore.instance;
+    if (skinToBuy != null) {
+      var skin = skinToBuy!;
+      var db = FirebaseFirestore.instance;
+      db.runTransaction((transaction) async {
+        transaction.set(db.collection("user_skins").doc(skin.id), {
+          "id": skin.id,
+          "color": skin.color,
+          "imageUrl": skin.imageUrl,
+          "modelUrl": skin.modelUrl,
+          "name": skin.name,
+          "price": skin.price,
+          "uid": UserProvider.uid,
+        });
 
-    db.runTransaction((transaction) async {
-      transaction.set(
-          db
-              .collection("users")
-              .doc(UserProvider.uid)
-              .collection("skins")
-              .doc(skin.id),
-          {
-            "id": skin.id,
-            "color": skin.color,
-            "imageUrl": skin.imageUrl,
-            "modelUrl": skin.modelUrl,
-            "name": skin.name,
-            "price": skin.price,
-          });
+        transaction.update(db.collection("users").doc(UserProvider.uid), {
+          "points": UserProvider.points + skin.price * (skin.color + 1),
+          "currentSkin": skin.id,
+        });
+      }).then((value) {
+        UserProvider.points =
+            (UserProvider.points + skin.price * (skin.color + 1)).toInt();
 
-      transaction.update(db.collection("users").doc(UserProvider.uid), {
-        "points": UserProvider.points + skin.price * (skin.color + 1),
-        "currentSkin": skin.id,
+        UserProvider.currentSkin = skin.id;
+
+        points = UserProvider.points;
+        currentSkin = UserProvider.currentSkin;
+
+        skins.removeWhere((product) => product.id == skin.id);
+        mySkins.add(skin);
+        notifyListeners();
+        Navigator.of(context).pop();
       });
-    }).then((value) {
-      UserProvider.points =
-          (UserProvider.points + skin.price * (skin.color + 1)).toInt();
+    }
+    // var razor = RazorpayHelper(context);
+    // razor.openCheckout(
+    //     name: "surya",
+    //     amount: 100,
+    //     description: "test1",
+    //     contact: "7010450504");
+  }
 
-      UserProvider.currentSkin = skin.id;
+  void rhandlePaymentSuccess(Map<dynamic, dynamic> response) {
+    log('Success Response: $response');
+  }
 
-      points = UserProvider.points;
-      currentSkin = UserProvider.currentSkin;
-
-      skins.removeWhere((product) => product.id == skin.id);
-      mySkins.add(skin);
-      notifyListeners();
-      Navigator.of(context).pop();
-    });
+  void rhandlePaymentError(Map<dynamic, dynamic> response) {
+    log('Error Response: $response');
   }
 }

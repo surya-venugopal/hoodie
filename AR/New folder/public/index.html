@@ -1,0 +1,80 @@
+<head>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.151.3/three.min.js">
+        import jsQR from "jsqr";
+        // Example using jsQR library for QR code detection
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const video = document.createElement('video');
+
+        // Capture video from camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(error => {
+                console.error('Failed to access camera: ', error);
+            });
+
+        // Continuously capture video frames and detect QR code
+        function captureFrame() {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+                // QR code detected, extract information and proceed to person tracking
+                const qrData = code.data;
+                trackPerson(qrData);
+            }
+
+            requestAnimationFrame(captureFrame);
+        }
+
+
+        // Example using AR.js library for person tracking
+        const arToolkitSource = new THREEx.ArToolkitSource({
+            sourceType: 'webcam'
+        });
+
+        arToolkitSource.init(() => {
+            // AR.js source initialized, proceed to person tracking
+            trackPerson();
+        });
+
+        // Create AR scene, camera, and marker
+        const arToolkitContext = new THREEx.ArToolkitContext({
+            cameraParametersUrl: 'data/camera_para.dat',
+            detectionMode: 'mono'
+        });
+        arToolkitContext.init(() => {
+            // AR.js context initialized, proceed to person tracking
+            trackPerson();
+        });
+
+        function trackPerson(qrData) {
+            // Update AR scene with person tracking based on QR code information
+            // Use qrData to determine if the person is wearing the appropriate QR code
+
+            // Example: Update 3D model position and orientation based on person tracking
+            const markerRoot = arToolkitContext.arController.createThreeBarcodeMarker(qrData);
+
+            // Example: Update 3D model position and orientation based on marker tracking
+            const personModel = createPersonModel();
+            personModel.position.copy(markerRoot.position);
+            personModel.quaternion.copy(markerRoot.quaternion);
+
+            // Example: Add person model to AR scene
+            scene.add(personModel);
+
+            // Example: Update AR scene in real-time
+            arToolkitContext.update();
+        }
+
+        captureFrame();
+
+    </script>
+</body>

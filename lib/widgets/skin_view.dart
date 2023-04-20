@@ -7,19 +7,18 @@ import 'package:provider/provider.dart';
 class SkinView extends StatelessWidget {
   final SkinModel skin;
   final HasBought hasBought;
+  final double height;
 
   const SkinView({
     super.key,
+    required this.height,
     required this.skin,
     required this.hasBought,
   });
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return SizedBox(
+      height: height,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
@@ -62,6 +61,8 @@ class SkinView extends StatelessWidget {
                                   skin: skin,
                                 );
                               } else {
+                                // var res = RazorpayHelper.generateOrderId(100);
+
                                 await Provider.of<SkinsProvider>(context,
                                         listen: false)
                                     .buySkin(
@@ -70,7 +71,8 @@ class SkinView extends StatelessWidget {
                                 );
                               }
                             },
-                            child: Text(hasBought == HasBought.yes && skin.description != "Equipped"
+                            child: Text(hasBought == HasBought.yes &&
+                                    skin.description != "Equipped"
                                 ? "Equip"
                                 : skin.description),
                           ),
