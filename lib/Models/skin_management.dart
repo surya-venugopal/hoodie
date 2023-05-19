@@ -34,7 +34,7 @@ class SkinsProvider with ChangeNotifier {
   DocumentSnapshot? lastDocument;
 
   late String currentSkin;
-  late int points;
+  late num points;
 
   getUser() {
     currentSkin = UserProvider.currentSkin;
@@ -47,6 +47,18 @@ class SkinsProvider with ChangeNotifier {
         .collection("user_skins")
         .where("uid", isEqualTo: UserProvider.uid)
         .get();
+    // var skin =
+    //     querySnapshot.docs.firstWhere((skin) => currentSkin != skin["id"]);
+    // mySkins.add(
+    //   SkinModel(
+    //       id: skin["id"],
+    //       price: skin["price"],
+    //       color: skin["color"],
+    //       name: skin["name"],
+    //       description: "${skin["price"]}  \$",
+    //       imageUrl: skin["imageUrl"],
+    //       modelUrl: skin["modelUrl"]),
+    // );
 
     for (var skin in querySnapshot.docs) {
       mySkins.add(
@@ -63,7 +75,9 @@ class SkinsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getSkins() async {
+  Future<void> getSkins({
+    String search = "",
+  }) async {
     if (!hasMore) {
       log('No More Products');
       return;
@@ -76,26 +90,50 @@ class SkinsProvider with ChangeNotifier {
 
     QuerySnapshot querySnapshot;
     if (lastDocument == null) {
-      querySnapshot = await firestore
-          .collection('skins')
-          .orderBy('id')
-          .where("id",
-              whereNotIn: mySkins.isEmpty
-                  ? [" "]
-                  : mySkins.map((element) => element.id).toList())
-          .limit(_documentLimit)
-          .get();
+      if (search.isEmpty) {
+        querySnapshot = await firestore
+            .collection('skins')
+            // .where("name", isEqualTo: "jacket")
+            .where("id",
+                whereNotIn: mySkins.isEmpty
+                    ? [" "]
+                    : mySkins.map((element) => element.id).toList())
+            .limit(_documentLimit)
+            .get();
+      } else {
+        querySnapshot = await firestore
+            .collection('skins')
+            .where("id",
+                whereNotIn: mySkins.isEmpty
+                    ? [" "]
+                    : mySkins.map((element) => element.id).toList())
+            .where("name", isGreaterThanOrEqualTo: search)
+            .limit(_documentLimit)
+            .get();
+      }
     } else {
-      querySnapshot = await firestore
-          .collection('skins')
-          .orderBy('id')
-          .where("id",
-              whereNotIn: mySkins.isEmpty
-                  ? [" "]
-                  : mySkins.map((element) => element.id).toList())
-          .startAfterDocument(lastDocument!)
-          .limit(_documentLimit)
-          .get();
+      if (search.isEmpty) {
+        querySnapshot = await firestore
+            .collection('skins')
+            .where("id",
+                whereNotIn: mySkins.isEmpty
+                    ? [" "]
+                    : mySkins.map((element) => element.id).toList())
+            .startAfterDocument(lastDocument!)
+            .limit(_documentLimit)
+            .get();
+      } else {
+        querySnapshot = await firestore
+            .collection('skins')
+            .where("id",
+                whereNotIn: mySkins.isEmpty
+                    ? [" "]
+                    : mySkins.map((element) => element.id).toList())
+            .where("name", isGreaterThanOrEqualTo: search)
+            .startAfterDocument(lastDocument!)
+            .limit(_documentLimit)
+            .get();
+      }
     }
     if (querySnapshot.docs.length < _documentLimit) {
       hasMore = false;
@@ -108,7 +146,7 @@ class SkinsProvider with ChangeNotifier {
       querySnapshot.docs.map(
         (skin) => SkinModel(
             id: skin["id"],
-            price: skin["price"],
+            price: skin["price"].toDouble(),
             color: skin["color"],
             name: skin["name"],
             description: "${skin["price"]}  \$",
@@ -121,8 +159,7 @@ class SkinsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  changeSkin(
-    BuildContext context, {
+  changeSkin({
     required SkinModel skin,
   }) async {
     if (UserProvider.currentSkin != skin.id) {
@@ -135,16 +172,12 @@ class SkinsProvider with ChangeNotifier {
       currentSkin = UserProvider.currentSkin;
       notifyListeners();
     }
-    Navigator.of(context).pop();
   }
 
   SkinModel? skinToBuy;
-  BuildContext? context;
-  buySkin(
-    BuildContext context, {
+  buySkin({
     required SkinModel skin,
   }) async {
-    this.context = context;
     skinToBuy = skin;
 
     if (skinToBuy != null) {
@@ -177,7 +210,6 @@ class SkinsProvider with ChangeNotifier {
         skins.removeWhere((product) => product.id == skin.id);
         mySkins.add(skin);
         notifyListeners();
-        Navigator.of(context).pop();
       });
     }
     // var razor = RazorpayHelper(context);

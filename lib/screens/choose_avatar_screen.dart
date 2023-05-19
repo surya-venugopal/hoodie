@@ -1,11 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hoodie/Models/user_management.dart';
-import 'package:hoodie/screens/home_screen.dart';
-
-import 'login_screen.dart';
 
 class AvatarSelectionScreen extends StatefulWidget {
   static const route = "AvatarSelectionScreen";
@@ -34,10 +30,10 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
   }
 
   Widget _buildAvatar(int index) {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      Navigator.of(context).pushReplacementNamed(LoginScreen.route);
-    }
+    // User? user = FirebaseAuth.instance.currentUser;
+    // if (user == null) {
+    //   Navigator.of(context).pushReplacementNamed(LoginScreen.route);
+    // }
     return GestureDetector(
       onTap: () => _onAvatarSelected(index),
       child: Padding(
@@ -55,34 +51,57 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Choose an avatar'),
-      ),
-      body: Center(
-        child: GridView.count(
-          crossAxisCount: 3,
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
-          childAspectRatio: 1,
-          padding: const EdgeInsets.all(8.0),
-          children: List.generate(
-            _avatars.length,
-            (index) => _buildAvatar(index),
-          ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(left: 10, top: 20),
+              child: Text(
+                "Choose Avatar",
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                childAspectRatio: 1,
+                padding: const EdgeInsets.all(8.0),
+                children: List.generate(
+                  _avatars.length,
+                  (index) => _buildAvatar(index),
+                ),
+              ),
+            ),
+            const SizedBox(height: 50),
+            InkWell(
+              onTap: () async {
+
+                Navigator.of(context).pop((_selectedAvatarIndex + 1).toString());
+              },
+              child: Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                height: 50,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: Colors.black),
+                alignment: Alignment.center,
+                child: const Text(
+                  "Continue",
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+            )
+          ],
         ),
-      ),
-      floatingActionButton: ElevatedButton(
-        onPressed: () async {
-          await FirebaseFirestore.instance
-              .collection("users")
-              .doc(UserProvider.uid)
-              .update({
-            "avatar": (_selectedAvatarIndex + 1).toString(),
-          });
-          UserProvider.avatar = (_selectedAvatarIndex + 1).toString();
-          Navigator.of(context).pushReplacementNamed(HomeScreen.route);
-        },
-        child: const Text("Confirm"),
       ),
     );
   }

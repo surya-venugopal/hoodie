@@ -17,7 +17,7 @@ class MyWidgets {
         const SizedBox(width: 20),
         Text(
           topic,
-          style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
         ),
         const SizedBox(width: 20),
         Container(
@@ -29,7 +29,7 @@ class MyWidgets {
     );
   }
 
-  static Widget slideButton(FutureOr<void> Function() action) {
+  static Widget slideButton(FutureOr<void> Function() action,String text) {
     return SlideAction(
       trackBuilder: (context, state) {
         return Container(
@@ -39,7 +39,7 @@ class MyWidgets {
           ),
           child: Center(
             child: Text(
-              state.isPerformingAction ? "Loading..." : "Continue",
+              state.isPerformingAction ? "Loading..." : text,
               style: const TextStyle(color: Colors.white),
             ),
           ),

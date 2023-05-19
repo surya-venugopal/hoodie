@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
@@ -11,6 +12,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
+    var messageId = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       backgroundColor: const Color(0xffE2DEFF),
       body: Column(
@@ -19,7 +21,9 @@ class _ChatPageState extends State<ChatPage> {
           ListTile(
             minLeadingWidth: 50,
             leading: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
               icon: const Icon(Icons.arrow_back),
             ),
             title: SizedBox(
@@ -47,6 +51,25 @@ class _ChatPageState extends State<ChatPage> {
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(30),
                 ),
+              ),
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("messages")
+                    .doc(messageId)
+                    .collection("messages")
+                    .orderBy("time", descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Text(
+                      'No Data...',
+                    );
+                  } else {
+                    var messages = snapshot.data!.docs;
+
+                    return Container();
+                  }
+                },
               ),
             ),
           )

@@ -1,118 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:hoodie/Models/skin_management.dart';
 import 'package:hoodie/app_utils.dart';
-import 'package:model_viewer_plus/model_viewer_plus.dart';
-import 'package:provider/provider.dart';
+
+import '../Models/user_management.dart';
+import '../screens/skin_info_screen.dart';
+import '../Models/favorite_provider.dart';
 
 class SkinView extends StatelessWidget {
   final SkinModel skin;
   final HasBought hasBought;
   final double height;
+  final FavoriteProvider favoriteProvider;
 
   const SkinView({
     super.key,
     required this.height,
     required this.skin,
     required this.hasBought,
+    required this.favoriteProvider,
   });
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          onTap: () {
-            showModalBottomSheet(
-                context: context,
-                builder: (c1) {
-                  return ListView(children: [
-                    SizedBox(
-                      height: 250,
-                      width: double.infinity,
-                      child: ModelViewer(
-                        src: skin.modelUrl,
-                        // alt: "A 3D model of an astronaut",
-                        ar: false,
-                        autoRotate: true,
-                        autoRotateDelay: 0,
-                        rotationPerSecond: "30deg",
-                        cameraControls: false,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            skin.name,
-                            style: const TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              if (hasBought == HasBought.yes) {
-                                await Provider.of<SkinsProvider>(context,
-                                        listen: false)
-                                    .changeSkin(
-                                  c1,
-                                  skin: skin,
-                                );
-                              } else {
-                                // var res = RazorpayHelper.generateOrderId(100);
-
-                                await Provider.of<SkinsProvider>(context,
-                                        listen: false)
-                                    .buySkin(
-                                  c1,
-                                  skin: skin,
-                                );
-                              }
-                            },
-                            child: Text(hasBought == HasBought.yes &&
-                                    skin.description != "Equipped"
-                                ? "Equip"
-                                : skin.description),
-                          ),
-                        ],
-                      ),
-                    )
-                  ]);
-                });
-          },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pushNamed(SkinInfoScreen.route, arguments: {
+          "skin": skin,
+          "hasBought": HasBought.no,
+          "equipped": (skin.id == UserProvider.currentSkin),
+          "favoriteProvider": favoriteProvider,
+        });
+      },
+      child: Column(
+        children: [
+          Stack(
             children: [
-              Image.network(
-                skin.imageUrl,
-                fit: BoxFit.fitWidth,
-                width: double.infinity,
-              ),
-              Text(
-                skin.name,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-              Container(
-                color: skin.color == 0
-                    ? Colors.green
-                    : skin.color == 1
-                        ? Colors.purple
-                        : Colors.red,
-                width: double.infinity,
-                height: 40,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child: Text(
-                  skin.description,
-                  style: const TextStyle(color: Colors.white, fontSize: 20),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: Image.network(
+                  skin.imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: height,
                 ),
-              )
+              ),
+              Positioned(
+                right: 10,
+                top: 10,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(30)),
+                  child: IconButton(
+                    color: favoriteProvider.skinIds.contains(skin.id)
+                        ? Colors.pink
+                        : Colors.white,
+                    onPressed: () {
+                      favoriteProvider.toggleFavorite(skin.id);
+                    },
+                    icon: Icon(
+                      favoriteProvider.skinIds.contains(skin.id)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-        ),
+          const SizedBox(height: 10),
+          Text(
+            skin.name,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Text(
+            "\$ ${skin.price}",
+            style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontSize: 20,
+                fontWeight: FontWeight.w800),
+          ),
+        ],
       ),
     );
   }
