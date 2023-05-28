@@ -193,14 +193,16 @@ class _MarketplaceFragmentState extends State<MarketplaceFragment>
                         skin: _favSelected
                             ? skinProvider.favoriteSkins[index]
                             : skinProvider.skins[index],
-                        hasBought: skinProvider.mySkins.indexWhere(
-                                  (element) =>
-                                      element.id ==
-                                      skinProvider.skins[index].id,
-                                ) ==
-                                -1
+                        hasBought: _favSelected
                             ? HasBought.no
-                            : HasBought.yes,
+                            : skinProvider.mySkins.indexWhere(
+                                      (element) =>
+                                          element.id ==
+                                          skinProvider.skins[index].id,
+                                    ) ==
+                                    -1
+                                ? HasBought.no
+                                : HasBought.yes,
                       );
                     },
                   ),

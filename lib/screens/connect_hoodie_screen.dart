@@ -16,60 +16,7 @@ class _ConnectHoodieScreenState extends State<ConnectHoodieScreen> {
 
   String _msg = "Unlock the power of augmented reality by clicking this button";
 
-  connect() {
-    _qrScanner.getScannedQrBarCode(
-      context: context,
-      onCode: (code) {
-        if (code != null) {
-          code = code.substring(code.indexOf("code=") + 5);
-          showDialog(
-            context: context,
-            builder: (c1) {
-              return AlertDialog(
-                title: const Text("Confirm"),
-                content: Center(
-                  child: Text(
-                    "Are you you want to link this hoodie to ${UserProvider.name}",
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                actions: [
-                  ElevatedButton(
-                      onPressed: () async {
-                        var db = FirebaseFirestore.instance;
-                        var doc =
-                            await db.collection('hoodies').doc(code).get();
-                        if (doc.exists) {
-                          if (doc["uid"] == "") {
-                            db.collection("hoodies").doc(code).set({
-                              "uid": UserProvider.uid,
-                            });
-
-                            setState(() {
-                              _msg = "Successfully connected";
-                            });
-                          } else {
-                            setState(() {
-                              _msg =
-                                  "Ooops ... This hoodie is connected to another account!";
-                            });
-                          }
-                        } else {
-                          setState(() {
-                            _msg = "This is not a valid code!";
-                          });
-                        }
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("Link"))
-                ],
-              );
-            },
-          );
-        }
-      },
-    );
-  }
+  connect() {}
 
   // bool isInit = true;
   @override
@@ -120,7 +67,69 @@ class _ConnectHoodieScreenState extends State<ConnectHoodieScreen> {
                     const SizedBox(height: 10),
                     if (_msg != "Successfully connected")
                       InkWell(
-                        onTap: connect,
+                        onTap: () async {
+                          _qrScanner.getScannedQrBarCode(
+                            context: context,
+                            onCode: (code) {
+                              if (code != null) {
+                                code =
+                                    code.substring(code.indexOf("code=") + 5);
+                                showDialog(
+                                  context: context,
+                                  builder: (c1) {
+                                    return AlertDialog(
+                                      title: const Text("Confirm"),
+                                      content: Center(
+                                        child: Text(
+                                          "Are you you want to link this hoodie to ${UserProvider.name}",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                      actions: [
+                                        ElevatedButton(
+                                            onPressed: () async {
+                                              var db =
+                                                  FirebaseFirestore.instance;
+                                              var doc = await db
+                                                  .collection('hoodies')
+                                                  .doc(code)
+                                                  .get();
+                                              if (doc.exists) {
+                                                if (doc["uid"] == "") {
+                                                  db
+                                                      .collection("hoodies")
+                                                      .doc(code)
+                                                      .set({
+                                                    "uid": UserProvider.uid,
+                                                  });
+
+                                                  setState(() {
+                                                    _msg =
+                                                        "Successfully connected";
+                                                  });
+                                                } else {
+                                                  setState(() {
+                                                    _msg =
+                                                        "Ooops ... This hoodie is connected to another account!";
+                                                  });
+                                                }
+                                              } else {
+                                                setState(() {
+                                                  _msg =
+                                                      "This is not a valid code!";
+                                                });
+                                              }
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text("Link"))
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                          );
+                        },
                         child: Container(
                           width: double.infinity,
                           height: 50,

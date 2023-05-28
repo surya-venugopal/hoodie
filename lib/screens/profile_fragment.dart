@@ -313,15 +313,15 @@ class _ProfileFragmentState extends State<ProfileFragment>
             const SizedBox(height: 100),
           ],
         ),
-        Positioned(
-          bottom: 35,
-          child: FloatingActionButton(
-            backgroundColor: Theme.of(context).primaryColor,
-            elevation: 0.1,
-            onPressed: () {},
-            child: const Icon(Icons.download),
-          ),
-        ),
+        // Positioned(
+        //   bottom: 35,
+        //   child: FloatingActionButton(
+        //     backgroundColor: Theme.of(context).primaryColor,
+        //     elevation: 0.1,
+        //     onPressed: () {},
+        //     child: const Icon(Icons.download),
+        //   ),
+        // ),
       ],
     );
   }

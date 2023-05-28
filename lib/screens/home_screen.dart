@@ -3,6 +3,8 @@ import 'package:hoodie/screens/chat_people.dart';
 import 'package:hoodie/screens/marketplace_fragment.dart';
 import 'package:hoodie/screens/profile_fragment.dart';
 import 'package:hoodie/screens/spotted_fragment.dart';
+import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app_utils.dart';
 
@@ -46,6 +48,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _pageController!.jumpToPage(_selectedIndex);
   }
 
+  final _qrScanner = QrBarCodeScannerDialog();
+
   @override
   Widget build(BuildContext context) {
     // User? user = FirebaseAuth.instance.currentUser;
@@ -80,16 +84,40 @@ class _HomeScreenState extends State<HomeScreen> {
                         size: Size(size.width, 80),
                         painter: BNBCustomPainter(),
                       ),
-                      if (_selectedIndex != 3)
-                        Center(
-                          heightFactor: 0.6,
-                          child: FloatingActionButton(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            elevation: 0.1,
-                            onPressed: () {},
-                            child: const Icon(Icons.camera),
-                          ),
+                      // if (_selectedIndex != 3)
+                      Center(
+                        heightFactor: 0.6,
+                        child: FloatingActionButton(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          elevation: 0.1,
+                          onPressed: () {
+                            _qrScanner.getScannedQrBarCode(
+                              context: context,
+                              onCode: (code) async {
+                                if (code != null &&
+                                    code.contains("hoodie-ar.web.app")) {
+                                  code =
+                                      code.substring(code.indexOf("code=") + 5);
+                                  if (!await launchUrl(Uri.parse(code))) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("Not a valid hoodie!"),
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Not a valid hoodie!"),
+                                    ),
+                                  );
+                                }
+                              },
+                            );
+                          },
+                          child: const Icon(Icons.camera),
                         ),
+                      ),
                       SizedBox(
                         width: size.width,
                         height: 80,

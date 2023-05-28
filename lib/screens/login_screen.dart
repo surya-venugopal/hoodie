@@ -146,9 +146,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ColoredBox(
                       color: const Color.fromARGB(255, 225, 225, 225),
                       child: IconButton(
+                        
                         iconSize: 30,
                         onPressed: () {
-                          AppUtils.dump();
+                          // AppUtils.dump();
                         },
                         icon: const Icon(Icons.location_city),
                       ),
