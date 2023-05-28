@@ -18,7 +18,6 @@ class FavoriteProvider with ChangeNotifier {
       skinIds.add(skinId);
     }
     await prefs.setStringList('items', skinIds);
-    log(skinIds.toString());
     notifyListeners();
   }
 
@@ -27,8 +26,6 @@ class FavoriteProvider with ChangeNotifier {
     try {
       skinIds = prefs.getStringList('items')!.toList();
     } catch (_) {}
-    log(skinIds.toString());
-
     notifyListeners();
   }
 }

@@ -5,7 +5,9 @@ import 'package:hoodie/screens/create_profile_screen.dart';
 import 'package:hoodie/widgets/my_widgets.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:pinput/pinput.dart';
+import 'package:provider/provider.dart';
 
+import '../Models/skin_management.dart';
 import '../app_utils.dart';
 import 'home_screen.dart';
 import '../Models/user_management.dart';
@@ -29,9 +31,22 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       UserProvider.name = user.phoneNumber.toString();
       UserProvider.uid = user.uid;
-      Navigator.of(context).pushReplacementNamed(HomeScreen.route);
+      fetchData().then((value) =>
+          Navigator.of(context).pushReplacementNamed(HomeScreen.route));
     }
     super.initState();
+  }
+
+  Future<void> fetchData() async {
+    var provider = Provider.of<SkinsProvider>(context, listen: false);
+
+    await UserProvider.getUser();
+    provider.getUser();
+    await provider.init();
+    await provider.getFavSkins();
+    await provider.getMySkins();
+    await provider.getSkins();
+    
   }
 
   String phone = "";
@@ -118,8 +133,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: IconButton(
                         iconSize: 30,
                         onPressed: () {
-                          Navigator.of(context)
-                              .pushReplacementNamed(HomeScreen.route);
+                          fetchData().then((value) => Navigator.of(context)
+                              .pushReplacementNamed(HomeScreen.route));
                         },
                         icon: const Icon(Icons.map),
                       ),
@@ -146,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: MyWidgets.slideButton(() async {
                   ConfirmationResult? confirmationResult;
-                    if (_formKey.currentState!.validate()) {
+                  if (_formKey.currentState!.validate()) {
                     confirmationResult = await FirebaseAuth.instance
                         .signInWithPhoneNumber(phone);
                     showDialog(
@@ -209,21 +224,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                               .user;
                                           if (u != null) {
                                             UserProvider.uid = u.uid;
-                                            DocumentSnapshot doc =
-                                                await FirebaseFirestore.instance
-                                                    .collection("users")
-                                                    .doc(u.uid)
-                                                    .get();
-                                            if (!doc.exists) {
-                                              Navigator.of(context)
-                                                  .pushReplacementNamed(
-                                                      CreateProfileScreen
-                                                          .route);
-                                            } else {
-                                              Navigator.of(context)
-                                                  .pushReplacementNamed(
-                                                      HomeScreen.route);
-                                            }
+                                            FirebaseFirestore.instance
+                                                .collection("users")
+                                                .doc(u.uid)
+                                                .get()
+                                                .then((doc) {
+                                              if (!doc.exists) {
+                                                Navigator.of(context)
+                                                    .pushReplacementNamed(
+                                                        CreateProfileScreen
+                                                            .route);
+                                              } else {
+                                                fetchData().then((value) =>
+                                                    Navigator.of(context)
+                                                        .pushReplacementNamed(
+                                                            HomeScreen.route));
+                                              }
+                                            });
                                           }
                                         } catch (e) {
                                           otpController.text = "";

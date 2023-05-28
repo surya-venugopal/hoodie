@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hoodie/Models/skin_management.dart';
-import 'package:hoodie/Models/favorite_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_app_bar/scroll_app_bar.dart';
 import '../app_utils.dart';
 import '../widgets/skin_view.dart';
 
 class MarketplaceFragment extends StatefulWidget {
+  const MarketplaceFragment({super.key});
+
   @override
   State<MarketplaceFragment> createState() => _MarketplaceFragmentState();
 }
@@ -17,9 +18,9 @@ class _MarketplaceFragmentState extends State<MarketplaceFragment>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
-  late List<SkinModel> skins;
   late SkinsProvider skinProvider;
-  late FavoriteProvider favoriteProvider;
+
+  bool _favSelected = false;
   @override
   void initState() {
     _scrollController.addListener(() {
@@ -42,19 +43,11 @@ class _MarketplaceFragmentState extends State<MarketplaceFragment>
     super.dispose();
   }
 
-  bool isInit = true;
-
   @override
   Widget build(BuildContext context) {
-    skinProvider = Provider.of<SkinsProvider>(context, listen: true);
-    favoriteProvider = Provider.of<FavoriteProvider>(context, listen: true);
-    if (isInit) {
-      favoriteProvider.init().then((value) {
-        favoriteProvider.fetchData();
-      });
-      isInit = false;
-    }
-    skins = skinProvider.skins;
+    super.build(context);
+    skinProvider = Provider.of<SkinsProvider>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
@@ -121,9 +114,14 @@ class _MarketplaceFragmentState extends State<MarketplaceFragment>
                     scrollDirection: Axis.horizontal,
                     children: [
                       IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.favorite_border,
+                        onPressed: () {
+                          setState(() {
+                            _favSelected = !_favSelected;
+                          });
+                        },
+                        icon: Icon(
+                          color: Colors.red,
+                          _favSelected ? Icons.favorite : Icons.favorite_border,
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -163,16 +161,24 @@ class _MarketplaceFragmentState extends State<MarketplaceFragment>
             elevation: 0,
           ),
           Expanded(
-            child: skins.isEmpty && !skinProvider.isLoading
-                ? const Center(
-                    child: Text('You owned all the skins!'),
+            child: !skinProvider.isLoading &&
+                    (_favSelected && skinProvider.favoriteSkins.isEmpty ||
+                        !_favSelected && skinProvider.skins.isEmpty)
+                ? Center(
+                    child: Text(
+                        _favSelected && skinProvider.favoriteSkins.isEmpty
+                            ? 'No favorite skins found'
+                            : 'You owned all the skins!'),
                   )
                 : MasonryGridView.count(
-                    controller: _scrollController,
+                    controller:
+                        _favSelected ? ScrollController() : _scrollController,
                     crossAxisCount: 2,
                     mainAxisSpacing: 20,
                     crossAxisSpacing: 10,
-                    itemCount: skins.length,
+                    itemCount: _favSelected
+                        ? skinProvider.favoriteSkins.length
+                        : skinProvider.skins.length,
                     itemBuilder: (context, index) {
                       return SkinView(
                         height: [
@@ -184,9 +190,17 @@ class _MarketplaceFragmentState extends State<MarketplaceFragment>
                           250.0,
                           290.0
                         ][index % 7],
-                        skin: skins[index],
-                        hasBought: HasBought.no,
-                        favoriteProvider: favoriteProvider,
+                        skin: _favSelected
+                            ? skinProvider.favoriteSkins[index]
+                            : skinProvider.skins[index],
+                        hasBought: skinProvider.mySkins.indexWhere(
+                                  (element) =>
+                                      element.id ==
+                                      skinProvider.skins[index].id,
+                                ) ==
+                                -1
+                            ? HasBought.no
+                            : HasBought.yes,
                       );
                     },
                   ),

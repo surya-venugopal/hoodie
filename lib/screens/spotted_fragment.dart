@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:hoodie/Models/spot_management.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -81,32 +84,95 @@ class _SpottedFragmentState extends State<SpottedFragment>
                       point: LatLng(spot.latitude, spot.longitude),
                       builder: (context) => GestureDetector(
                         onTap: () async {
-                          _videoPlayerController =
-                              VideoPlayerController.network(spot.videoUrl)
-                                ..initialize().then((_) {
-                                  // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-                                  // setState(() {});
-                                  _videoPlayerController.setLooping(true);
-                                  _videoPlayerController.play();
-                                  showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) {
-                                        return Column(
-                                          children: [
-                                            Text(spot.time.toString()),
-                                            Expanded(
-                                              child: AspectRatio(
-                                                aspectRatio:
+                          _videoPlayerController = VideoPlayerController
+                              .network(spot.videoUrl)
+                            ..initialize().then((_) {
+                              // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+                              // setState(() {});
+                              _videoPlayerController.setLooping(true);
+                              _videoPlayerController.play();
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      contentPadding: const EdgeInsets.all(20),
+                                      shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(30))),
+                                      content: SizedBox(
+                                        width: double.infinity,
+                                        height: _videoPlayerController
+                                                    .value.aspectRatio >
+                                                1
+                                            ? 300
+                                            : max(
+                                                700,
+                                                300 /
                                                     _videoPlayerController
-                                                        .value.aspectRatio,
+                                                        .value.aspectRatio),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            AspectRatio(
+                                              aspectRatio:
+                                                  _videoPlayerController
+                                                      .value.aspectRatio,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
                                                 child: VideoPlayer(
                                                     _videoPlayerController),
                                               ),
                                             ),
+                                            const SizedBox(
+                                              height: 30,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Date : ${DateFormat("yMd").format(spot.time)}",
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Time : ${DateFormat.jm().format(spot.time)}",
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 30,
+                                            ),
+                                            Container(
+                                              width: double.infinity,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                  color: Colors.black),
+                                              alignment: Alignment.center,
+                                              child: const Text(
+                                                "Share",
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              ),
+                                            ),
                                           ],
-                                        );
-                                      });
-                                });
+                                        ),
+                                      ),
+                                    );
+                                  });
+                            });
                         },
                         child: Icon(
                           Icons.location_on,

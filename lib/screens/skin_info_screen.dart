@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hoodie/Models/skin_management.dart';
+import 'package:hoodie/Models/user_management.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../app_utils.dart';
-import '../Models/favorite_provider.dart';
 import '../widgets/my_widgets.dart';
 
 class SkinInfoScreen extends StatefulWidget {
@@ -16,19 +16,11 @@ class SkinInfoScreen extends StatefulWidget {
 }
 
 class _SkinInfoScreenState extends State<SkinInfoScreen> {
-  late FavoriteProvider favoriteProvider;
   bool isInit = true;
   @override
   Widget build(BuildContext context) {
     var args = ModalRoute.of(context)!.settings.arguments as Map;
     var skin = args["skin"] as SkinModel;
-    favoriteProvider = Provider.of<FavoriteProvider>(context, listen: true);
-    if (isInit) {
-      // favoriteProvider.init().then((value) {
-      //   favoriteProvider.fetchData();
-      // });
-      isInit = false;
-    }
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -96,18 +88,21 @@ class _SkinInfoScreenState extends State<SkinInfoScreen> {
                               ],
                             ),
                             args["hasBought"] != HasBought.yes
-                                ? IconButton(
-                                    iconSize: 35,
-                                    onPressed: () {
-                                      favoriteProvider.toggleFavorite(skin.id);
-                                    },
-                                    icon: Icon(
-                                      favoriteProvider.skinIds.contains(skin.id)
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color: Colors.red,
-                                    ),
-                                  )
+                                ? Consumer<SkinsProvider>(builder:
+                                    (context, favoriteProvider, child) {
+                                    return IconButton(
+                                        iconSize: 35,
+                                        onPressed: () {
+                                          favoriteProvider
+                                              .toggleFavorite(skin.id);
+                                        },
+                                        icon: Icon(
+                                          skin.favorite
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: Colors.red,
+                                        ));
+                                  })
                                 : Container()
                           ],
                         ),
@@ -139,14 +134,26 @@ class _SkinInfoScreenState extends State<SkinInfoScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      if (args["hasBought"] != HasBought.yes)
-                        MyWidgets.slideButton(() async {
-                          await Provider.of<SkinsProvider>(context,
-                                  listen: false)
-                              .buySkin(
-                            skin: skin,
-                          );
-                        }, "Buy"),
+                      args["hasBought"] != HasBought.yes
+                          ? MyWidgets.slideButton(() async {
+                              await Provider.of<SkinsProvider>(context,
+                                      listen: false)
+                                  .buySkin(
+                                    skin: skin,
+                                  )
+                                  .then((value) => Navigator.of(context).pop());
+                            }, "Buy")
+                          : UserProvider.currentSkin != skin.id
+                              ? MyWidgets.slideButton(() async {
+                                  await Provider.of<SkinsProvider>(context,
+                                          listen: false)
+                                      .equipSkin(
+                                        skin: skin,
+                                      )
+                                      .then((value) =>
+                                          Navigator.of(context).pop());
+                                }, "Equip")
+                              : Container(),
                       const SizedBox(height: 20),
                     ],
                   ),

@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hoodie/Models/spot_management.dart';
 import 'package:hoodie/screens/chat_people.dart';
 import 'package:hoodie/screens/marketplace_fragment.dart';
 import 'package:hoodie/screens/profile_fragment.dart';
 import 'package:hoodie/screens/spotted_fragment.dart';
-import 'package:provider/provider.dart';
 
-import '../Models/skin_management.dart';
-import '../Models/user_management.dart';
 import '../app_utils.dart';
-import '../Models/favorite_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   static const route = "HomeScreen";
@@ -20,22 +15,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 2;
   final List<Widget> _pages = [
     const ChatPeopleFragment(),
-    ChangeNotifierProvider(
-      create: (context) => FavoriteProvider(),
-      child: MarketplaceFragment(),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => SpotProvider(),
-      child: const SpottedFragment(),
-    ),
+    const MarketplaceFragment(),
+    const SpottedFragment(),
     const ProfileFragment(),
   ];
 
   PageController? _pageController;
-  var isInit = true;
+
+  @override
+  void initState() {
+    _pageController = PageController(initialPage: _selectedIndex);
+
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -57,18 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // if (user == null) {
     //   Navigator.of(context).pushReplacementNamed(LoginScreen.route);
     // }
-    if (isInit) {
-      var provider = Provider.of<SkinsProvider>(context, listen: false);
-      UserProvider.getUser()
-          .then((value) => provider.getUser())
-          .then((value) =>
-              provider.getMySkins().then((value) => provider.getSkins()))
-          .then((value) =>
-              _pageController = PageController(initialPage: _selectedIndex))
-          .then((value) => setState(() {
-                isInit = false;
-              }));
-    }
+
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
@@ -96,15 +80,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         size: Size(size.width, 80),
                         painter: BNBCustomPainter(),
                       ),
-                      Center(
-                        heightFactor: 0.6,
-                        child: FloatingActionButton(
-                          backgroundColor: Theme.of(context).primaryColor,
-                          elevation: 0.1,
-                          onPressed: () {},
-                          child: const Icon(Icons.camera),
+                      if (_selectedIndex != 3)
+                        Center(
+                          heightFactor: 0.6,
+                          child: FloatingActionButton(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            elevation: 0.1,
+                            onPressed: () {},
+                            child: const Icon(Icons.camera),
+                          ),
                         ),
-                      ),
                       SizedBox(
                         width: size.width,
                         height: 80,

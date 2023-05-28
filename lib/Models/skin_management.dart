@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hoodie/Models/user_management.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SkinModel {
   final String id;
@@ -12,9 +13,10 @@ class SkinModel {
   final String imageUrl;
   final String modelUrl;
   final int color;
-
+  bool favorite = false;
   SkinModel(
-      {required this.id,
+      {this.favorite = false,
+      required this.id,
       required this.price,
       required this.color,
       required this.name,
@@ -25,6 +27,7 @@ class SkinModel {
 
 class SkinsProvider with ChangeNotifier {
   List<SkinModel> skins = [];
+  List<SkinModel> favoriteSkins = [];
   List<SkinModel> mySkins = [];
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -36,7 +39,57 @@ class SkinsProvider with ChangeNotifier {
   late String currentSkin;
   late num points;
 
-  getUser() {
+  List<String> favSkinsLocal = [];
+
+  late SharedPreferences prefs;
+  Future<void> init() async {
+    prefs = await SharedPreferences.getInstance();
+    favSkinsLocal = [];
+    try {
+      favSkinsLocal = prefs.getStringList('items')!.toList();
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  Future<void> toggleFavorite(String skinId) async {
+    if (favSkinsLocal.contains(skinId)) {
+      favSkinsLocal.remove(skinId);
+      skins[skins.indexWhere((skin) => skin.id == skinId)].favorite = false;
+      favoriteSkins.removeWhere((skin) => skin.id == skinId);
+    } else {
+      favSkinsLocal.add(skinId);
+      skins[skins.indexWhere((skin) => skin.id == skinId)].favorite = true;
+      favoriteSkins.add(skins.firstWhere((skin) => skin.id == skinId));
+    }
+    await prefs.setStringList('items', favSkinsLocal);
+    notifyListeners();
+  }
+
+  Future<void> getFavSkins() async {
+    favoriteSkins = [];
+    QuerySnapshot querySnapshot = await firestore
+        .collection('skins')
+        // .where("name", isEqualTo: "jacket")
+        .where("id", whereIn: favSkinsLocal.isEmpty ? [" "] : favSkinsLocal)
+        .get();
+
+    favoriteSkins.addAll(
+      querySnapshot.docs.map(
+        (skin) => SkinModel(
+          id: skin.id,
+          price: skin["price"].toDouble(),
+          color: skin["color"],
+          name: skin["name"],
+          description: "${skin["price"]}  \$",
+          imageUrl: skin["imageUrl"],
+          modelUrl: skin["modelUrl"],
+          favorite: true,
+        ),
+      ),
+    );
+  }
+
+  void getUser() {
     currentSkin = UserProvider.currentSkin;
     points = UserProvider.points;
     notifyListeners();
@@ -52,7 +105,7 @@ class SkinsProvider with ChangeNotifier {
     // mySkins.add(
     //   SkinModel(
     //       id: skin["id"],
-    //       price: skin["price"],
+    //       price: skin["price"]
     //       color: skin["color"],
     //       name: skin["name"],
     //       description: "${skin["price"]}  \$",
@@ -63,13 +116,15 @@ class SkinsProvider with ChangeNotifier {
     for (var skin in querySnapshot.docs) {
       mySkins.add(
         SkinModel(
-            id: skin["id"],
-            price: skin["price"],
-            color: skin["color"],
-            name: skin["name"],
-            description: "${skin["price"]}  \$",
-            imageUrl: skin["imageUrl"],
-            modelUrl: skin["modelUrl"]),
+          id: skin.id,
+          price: skin["price"],
+          color: skin["color"],
+          name: skin["name"],
+          description: "${skin["price"]}  \$",
+          imageUrl: skin["imageUrl"],
+          modelUrl: skin["modelUrl"],
+          favorite: favSkinsLocal.contains(skin.id),
+        ),
       );
     }
     notifyListeners();
@@ -94,19 +149,19 @@ class SkinsProvider with ChangeNotifier {
         querySnapshot = await firestore
             .collection('skins')
             // .where("name", isEqualTo: "jacket")
-            .where("id",
-                whereNotIn: mySkins.isEmpty
-                    ? [" "]
-                    : mySkins.map((element) => element.id).toList())
+            // .where("id",
+            //     whereNotIn: mySkins.isEmpty
+            //         ? [" "]
+            //         : mySkins.map((element) => element.id).toList())
             .limit(_documentLimit)
             .get();
       } else {
         querySnapshot = await firestore
             .collection('skins')
-            .where("id",
-                whereNotIn: mySkins.isEmpty
-                    ? [" "]
-                    : mySkins.map((element) => element.id).toList())
+            // .where("id",
+            //     whereNotIn: mySkins.isEmpty
+            //         ? [" "]
+            //         : mySkins.map((element) => element.id).toList())
             .where("name", isGreaterThanOrEqualTo: search)
             .limit(_documentLimit)
             .get();
@@ -115,20 +170,20 @@ class SkinsProvider with ChangeNotifier {
       if (search.isEmpty) {
         querySnapshot = await firestore
             .collection('skins')
-            .where("id",
-                whereNotIn: mySkins.isEmpty
-                    ? [" "]
-                    : mySkins.map((element) => element.id).toList())
+            // .where("id",
+            //     whereNotIn: mySkins.isEmpty
+            //         ? [" "]
+            //         : mySkins.map((element) => element.id).toList())
             .startAfterDocument(lastDocument!)
             .limit(_documentLimit)
             .get();
       } else {
         querySnapshot = await firestore
             .collection('skins')
-            .where("id",
-                whereNotIn: mySkins.isEmpty
-                    ? [" "]
-                    : mySkins.map((element) => element.id).toList())
+            // .where("id",
+            //     whereNotIn: mySkins.isEmpty
+            //         ? [" "]
+            //         : mySkins.map((element) => element.id).toList())
             .where("name", isGreaterThanOrEqualTo: search)
             .startAfterDocument(lastDocument!)
             .limit(_documentLimit)
@@ -145,21 +200,22 @@ class SkinsProvider with ChangeNotifier {
     skins.addAll(
       querySnapshot.docs.map(
         (skin) => SkinModel(
-            id: skin["id"],
-            price: skin["price"].toDouble(),
-            color: skin["color"],
-            name: skin["name"],
-            description: "${skin["price"]}  \$",
-            imageUrl: skin["imageUrl"],
-            modelUrl: skin["modelUrl"]),
+          id: skin.id,
+          price: skin["price"].toDouble(),
+          color: skin["color"],
+          name: skin["name"],
+          description: "${skin["price"]}  \$",
+          imageUrl: skin["imageUrl"],
+          modelUrl: skin["modelUrl"],
+          favorite: favSkinsLocal.contains(skin.id),
+        ),
       ),
     );
-
     isLoading = false;
     notifyListeners();
   }
 
-  changeSkin({
+  Future<void> equipSkin({
     required SkinModel skin,
   }) async {
     if (UserProvider.currentSkin != skin.id) {
@@ -174,44 +230,42 @@ class SkinsProvider with ChangeNotifier {
     }
   }
 
-  SkinModel? skinToBuy;
-  buySkin({
+  Future<void> buySkin({
     required SkinModel skin,
   }) async {
-    skinToBuy = skin;
-
-    if (skinToBuy != null) {
-      var skin = skinToBuy!;
-      var db = FirebaseFirestore.instance;
-      db.runTransaction((transaction) async {
-        transaction.set(db.collection("user_skins").doc(skin.id), {
-          "id": skin.id,
-          "color": skin.color,
-          "imageUrl": skin.imageUrl,
-          "modelUrl": skin.modelUrl,
-          "name": skin.name,
-          "price": skin.price,
-          "uid": UserProvider.uid,
-        });
-
-        transaction.update(db.collection("users").doc(UserProvider.uid), {
-          "points": UserProvider.points + skin.price * (skin.color + 1),
-          "currentSkin": skin.id,
-        });
-      }).then((value) {
-        UserProvider.points =
-            (UserProvider.points + skin.price * (skin.color + 1)).toInt();
-
-        UserProvider.currentSkin = skin.id;
-
-        points = UserProvider.points;
-        currentSkin = UserProvider.currentSkin;
-
-        skins.removeWhere((product) => product.id == skin.id);
-        mySkins.add(skin);
-        notifyListeners();
+    var db = FirebaseFirestore.instance;
+    await db.runTransaction((transaction) async {
+      transaction.set(db.collection("user_skins").doc(skin.id), {
+        "id": skin.id,
+        "color": skin.color,
+        "imageUrl": skin.imageUrl,
+        "modelUrl": skin.modelUrl,
+        "name": skin.name,
+        "price": skin.price,
+        "uid": UserProvider.uid,
       });
-    }
+
+      transaction.update(db.collection("users").doc(UserProvider.uid), {
+        "points": UserProvider.points + skin.price * (skin.color + 1),
+        "currentSkin": skin.id,
+      });
+    });
+    UserProvider.points =
+        (UserProvider.points + skin.price * (skin.color + 1)).toInt();
+
+    UserProvider.currentSkin = skin.id;
+
+    points = UserProvider.points;
+    currentSkin = UserProvider.currentSkin;
+
+    // skins.removeWhere((product) => product.id == skin.id);
+    mySkins.add(skin);
+    favSkinsLocal.remove(skin.id);
+    skins[skins.indexWhere((skin1) => skin1.id == skin.id)].favorite = false;
+    favoriteSkins.removeWhere((skin1) => skin1.id == skin.id);
+    await prefs.setStringList('items', favSkinsLocal);
+
+    notifyListeners();
     // var razor = RazorpayHelper(context);
     // razor.openCheckout(
     //     name: "surya",

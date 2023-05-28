@@ -1,33 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:hoodie/Models/skin_management.dart';
 import 'package:hoodie/app_utils.dart';
+import 'package:provider/provider.dart';
 
 import '../Models/user_management.dart';
 import '../screens/skin_info_screen.dart';
-import '../Models/favorite_provider.dart';
 
-class SkinView extends StatelessWidget {
+class SkinView extends StatefulWidget {
   final SkinModel skin;
   final HasBought hasBought;
   final double height;
-  final FavoriteProvider favoriteProvider;
 
   const SkinView({
     super.key,
     required this.height,
     required this.skin,
     required this.hasBought,
-    required this.favoriteProvider,
   });
+
+  @override
+  State<SkinView> createState() => _SkinViewState();
+}
+
+class _SkinViewState extends State<SkinView> {
   @override
   Widget build(BuildContext context) {
+    SkinsProvider skinProvider = Provider.of<SkinsProvider>(context);
+
     return InkWell(
       onTap: () {
         Navigator.of(context).pushNamed(SkinInfoScreen.route, arguments: {
-          "skin": skin,
-          "hasBought": HasBought.no,
-          "equipped": (skin.id == UserProvider.currentSkin),
-          "favoriteProvider": favoriteProvider,
+          "skin": widget.skin,
+          "hasBought": widget.hasBought,
+          "equipped": (widget.skin.id == UserProvider.currentSkin),
         });
       },
       child: Column(
@@ -37,48 +42,64 @@ class SkinView extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(30),
                 child: Image.network(
-                  skin.imageUrl,
+                  widget.skin.imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
-                  height: height,
+                  height: widget.height,
                 ),
               ),
               Positioned(
                 right: 10,
                 top: 10,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      color: Colors.black26,
-                      borderRadius: BorderRadius.circular(30)),
-                  child: IconButton(
-                    color: favoriteProvider.skinIds.contains(skin.id)
-                        ? Colors.pink
-                        : Colors.white,
-                    onPressed: () {
-                      favoriteProvider.toggleFavorite(skin.id);
-                    },
-                    icon: Icon(
-                      favoriteProvider.skinIds.contains(skin.id)
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                    ),
-                  ),
-                ),
+                child: widget.hasBought == HasBought.yes
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 15),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: Colors.black38),
+                        child: const Text(
+                          "Owned",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: "Poppins",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w100,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            color: Colors.black26,
+                            borderRadius: BorderRadius.circular(30)),
+                        child: IconButton(
+                          color:
+                              widget.skin.favorite ? Colors.pink : Colors.white,
+                          onPressed: () {
+                            skinProvider.toggleFavorite(widget.skin.id);
+                          },
+                          icon: Icon(
+                            widget.skin.favorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                          ),
+                        ),
+                      ),
               ),
             ],
           ),
           const SizedBox(height: 10),
           Text(
-            skin.name,
+            widget.skin.name,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
           Text(
-            "\$ ${skin.price}",
+            "\$ ${widget.skin.price}",
             style: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: 20,

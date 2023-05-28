@@ -54,6 +54,7 @@ dependencies:
   scroll_app_bar: ^2.0.0
   pinput: ^2.2.21
   shared_preferences: ^2.1.1
+  intl: ^0.17.0
 
 
 dev_dependencies:
