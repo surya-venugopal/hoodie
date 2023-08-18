@@ -28,7 +28,7 @@ class SpotProvider with ChangeNotifier {
     QuerySnapshot querySnapshot = await firestore
         .collection("spotted")
         .where("uid", isEqualTo: UserProvider.uid)
-        // .orderBy('time')
+        .orderBy('time')
         .get();
     var sumLa = 0.0;
     var sumLo = 0.0;

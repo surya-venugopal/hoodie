@@ -18,19 +18,8 @@ class SpottedFragment extends StatefulWidget {
 class _SpottedFragmentState extends State<SpottedFragment>
     with AutomaticKeepAliveClientMixin<SpottedFragment> {
   late SpotProvider provider;
-  var _isinit = true;
   late VideoPlayerController _videoPlayerController;
-
-  @override
-  void didChangeDependencies() {
-    if (_isinit) {
-      provider = Provider.of<SpotProvider>(context);
-      provider.getAllSpots(MediaQuery.of(context).size.width);
-      _isinit = false;
-    }
-
-    super.didChangeDependencies();
-  }
+  bool today = true;
 
   @override
   void dispose() {
@@ -39,17 +28,29 @@ class _SpottedFragmentState extends State<SpottedFragment>
   }
 
   @override
+  void initState() {
+    Future.delayed(Duration.zero).then((value) {});
+    super.initState();
+  }
+
+  bool _isInit = true;
+  @override
   Widget build(BuildContext context) {
-    return provider.spots.isEmpty
-        ? const Center(
-            child: Text("You are not spotted!"),
-          )
+    if (_isInit) {
+      provider = Provider.of<SpotProvider>(context);
+      provider.getAllSpots(MediaQuery.of(context).size.width);
+      _isInit = false;
+    }
+    return provider.params.isEmpty
+        ? const Center(child: Text("Loading..."))
         : Stack(
             children: [
               FlutterMap(
                 options: MapOptions(
-                  center: provider.params["center"] as LatLng,
-                  zoom: provider.params["zoom"] as double,
+                  center: (provider.params["center"] as LatLng).latitude.isNaN
+                      ? LatLng(12, 77)
+                      : provider.params["center"] as LatLng,
+                  zoom: max(provider.params["zoom"] as double, 3),
                   maxZoom: 15,
                   rotationThreshold: 0,
                 ),
@@ -70,7 +71,17 @@ class _SpottedFragmentState extends State<SpottedFragment>
                     polylines: [
                       Polyline(
                         points: [
-                          ...provider.spots.map((spot) {
+                          ...provider.spots.where((spot) {
+                            var now = DateTime.now();
+                            if (today) {
+                              return spot.time.day == now.day &&
+                                  spot.time.month == now.month &&
+                                  spot.time.year == now.year;
+                            } else {
+                              return spot.time.isAfter(DateTime.now()
+                                  .subtract(const Duration(days: 30)));
+                            }
+                          }).map((spot) {
                             return LatLng(spot.latitude, spot.longitude);
                           }).toList()
                         ],
@@ -82,7 +93,17 @@ class _SpottedFragmentState extends State<SpottedFragment>
                   ),
                   MarkerLayer(
                     markers: [
-                      ...provider.spots.map(
+                      ...provider.spots.where((spot) {
+                        var now = DateTime.now();
+                        if (today) {
+                          return spot.time.day == now.day &&
+                              spot.time.month == now.month &&
+                              spot.time.year == now.year;
+                        } else {
+                          return spot.time.isAfter(DateTime.now()
+                              .subtract(const Duration(days: 30)));
+                        }
+                      }).map(
                         (spot) => Marker(
                           point: LatLng(spot.latitude, spot.longitude),
                           builder: (context) => GestureDetector(
@@ -207,62 +228,123 @@ class _SpottedFragmentState extends State<SpottedFragment>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "No of times spotted:",
-                          style: TextStyle(
+                        Text(
+                          provider.spots.isEmpty ||
+                                  provider.spots.where((spot) {
+                                    var now = DateTime.now();
+                                    if (today) {
+                                      return spot.time.day == now.day &&
+                                          spot.time.month == now.month &&
+                                          spot.time.year == now.year;
+                                    } else {
+                                      return spot.time.isAfter(DateTime.now()
+                                          .subtract(const Duration(days: 30)));
+                                    }
+                                  }).isEmpty
+                              ? "You are not spotted!"
+                              : "No of times spotted:",
+                          style: const TextStyle(
                               fontFamily: "Poppins",
                               fontWeight: FontWeight.w100),
                         ),
                         const SizedBox(width: 30),
-                        Text(
-                          "22",
-                          style: TextStyle(
-                              fontFamily: "Poppins",
-                              color: Theme.of(context).primaryColor),
-                        ),
+                        if (provider.spots.isEmpty ||
+                            provider.spots.where((spot) {
+                              var now = DateTime.now();
+                              if (today) {
+                                return spot.time.day == now.day &&
+                                    spot.time.month == now.month &&
+                                    spot.time.year == now.year;
+                              } else {
+                                return spot.time.isAfter(DateTime.now()
+                                    .subtract(const Duration(days: 30)));
+                              }
+                            }).isNotEmpty)
+                          Text(
+                            provider.spots
+                                .where((spot) {
+                                  var now = DateTime.now();
+                                  if (today) {
+                                    return spot.time.day == now.day &&
+                                        spot.time.month == now.month &&
+                                        spot.time.year == now.year;
+                                  } else {
+                                    return spot.time.isAfter(DateTime.now()
+                                        .subtract(const Duration(days: 30)));
+                                  }
+                                })
+                                .length
+                                .toString(),
+                            style: TextStyle(
+                                fontFamily: "Poppins",
+                                color: Theme.of(context).primaryColor),
+                          ),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30)),
-                    width: 180,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 80,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              borderRadius: BorderRadius.circular(30)),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
-                          child: const Text(
-                            "Today",
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.w100,
-                                color: Colors.white),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        today = !today;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30)),
+                      width: 180,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 400),
+                            width: 80,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: !today
+                                    ? Colors.white
+                                    : Theme.of(context).primaryColor,
+                                borderRadius: BorderRadius.circular(30)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: Text(
+                              "Today",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: "Poppins",
+                                  fontWeight: FontWeight.w100,
+                                  color: !today
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.white),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Container(
-                          width: 80,
-                          alignment: Alignment.center,
-                          child: const Text(
-                            "30 days",
-                            style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.w100,
-                                fontSize: 15),
+                          const SizedBox(width: 10),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 400),
+                            width: 80,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: today
+                                    ? Colors.white
+                                    : Theme.of(context).primaryColor,
+                                borderRadius: BorderRadius.circular(30)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: Text(
+                              "30 days",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: "Poppins",
+                                  fontWeight: FontWeight.w100,
+                                  color: today
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.white),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],
